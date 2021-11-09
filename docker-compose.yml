@@ -1,0 +1,66 @@
+version: "3.9"
+volumes:
+  db-store:
+  pma-session-store:
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./infra/docker/go/Dockerfile
+    links:
+      - db
+    ports:
+      - target: 8080
+        published: ${WEB_PORT:-8080}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./server
+        target: /server
+
+  web:
+    build:
+      context: .
+      dockerfile: ./infra/docker/web/Dockerfile
+    ports:
+      - target: 80
+        published: ${WEB_PORT:-80}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./client
+        target: /client
+
+  db:
+    build:
+      context: .
+      dockerfile: ./infra/docker/mysql/Dockerfile
+    ports:
+      - target: 3306
+        published: ${DB_PORT:-3306}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: volume
+        source: db-store
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=${DB_HOST:-db}
+      - PMA_USER=${DB_USER}
+      - PMA_PASSWORD=${DB_PASS}
+    ports:
+      - 8888:80
+    volumes:
+      - pma-session-store:/sessions
