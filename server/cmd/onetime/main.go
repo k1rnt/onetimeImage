@@ -19,10 +19,10 @@ func main() {
 	e.GET("/", health_check)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8888"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 // Handler
 func health_check(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+	return c.String(http.StatusOK, "Hello, World")
 }
