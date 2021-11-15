@@ -20,5 +20,7 @@ ps:
 	docker compose ps
 logs:
 	docker compose logs
+app-dev:
+	docker compose exec app go run cmd/onetime/*.go
 app-test:
 	docker compose exec app go test -v ./...
