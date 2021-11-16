@@ -2,6 +2,7 @@ version: "3.9"
 volumes:
   db-store:
   pma-session-store:
+  node_modules_volume:
 services:
   app:
     build:
@@ -19,22 +20,26 @@ services:
       - type: bind
         source: ./server
         target: /go/src
-    # command: go run cmd/onetime/*.go
 
-  # web:
-  #   build:
-  #     context: .
-  #     dockerfile: ./infra/docker/web/Dockerfile
-  #   ports:
-  #     - target: 3000
-  #       published: ${WEB_PORT:-3000}
-  #       protocol: tcp
-  #       mode: host
-  #   volumes:
-  #     - type: bind
-  #       source: ./client
-  #       target: /client
-  #   tty: true
+  web:
+    build:
+      context: .
+      dockerfile: ./infra/docker/web/Dockerfile
+    tty: true
+    ports:
+      - target: 3000
+        published: ${WEB_PORT:-3000}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./client
+        target: /src
+      - type: volume
+        source: node_modules_volume
+        target: /src/node_modules
+        volume:
+          nocopy: true
 
   db:
     build:
