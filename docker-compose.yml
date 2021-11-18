@@ -8,8 +8,9 @@ services:
     build:
       context: .
       dockerfile: ./infra/docker/go/Dockerfile
-    links:
+    depends_on:
       - db
+    restart: always
     tty: true
     ports:
       - target: 8080
@@ -20,6 +21,13 @@ services:
       - type: bind
         source: ./server
         target: /go/src
+    environment:
+      - DBMS=${DBMS}
+      - MYSQL_HOST=${DB_HOST}
+      - MYSQL_PORT=${DB_PORT}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
 
   web:
     build:

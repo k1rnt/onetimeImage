@@ -1,0 +1,1 @@
+curl -X POST -H "Content-Type: application/json" -d '{}' localhost:8080/health
